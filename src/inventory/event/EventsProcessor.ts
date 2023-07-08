@@ -1,20 +1,35 @@
 import cron from 'node-cron';
 import { InventoryEventRepo } from './InventoryEventRepo';
+import { MessageService } from '../../messaging/MessageService';
 
 export class EventsProcessor {
   private inventoryEventRepo: InventoryEventRepo;
 
-  constructor(inventoryEventRepo: InventoryEventRepo) {
+  private messageService: MessageService;
+
+  constructor(messageService: MessageService, inventoryEventRepo: InventoryEventRepo) {
+    this.messageService = messageService;
     this.inventoryEventRepo = inventoryEventRepo;
     this.startCronJob();
   }
 
-  private startCronJob(): void {
+  private startCronJob() {
     cron.schedule('*/10 * * * * *', async () => {
-      // Your task or function to be executed on schedule goes here
-      console.log('Cron job running every 5s');
-      const result = await this.inventoryEventRepo.getUnprocessedEvents();
-      console.log("cronjob result: ", result);
+      console.log('Running cron job');
+      await this.messageService.start();
+
+      await this.processListUnsendEvent();
     });
+  }
+
+  private async processListUnsendEvent(): Promise<void> {
+    const unsendEvents = await this.inventoryEventRepo.getUnprocessedEvents();
+
+    for (const event of unsendEvents) {
+      console.log('event', event);
+
+      await this.messageService.sendMessage(JSON.stringify(event));
+      await this.inventoryEventRepo.markEventAsProcessed(event.getEventId());
+    }
   }
 }

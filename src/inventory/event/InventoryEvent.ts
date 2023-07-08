@@ -10,4 +10,20 @@ export class InventoryEvent {
     this.guid = guid;
     this.payloadBase64 = payloadBase64;
   }
+
+  getEventId(): string {
+    return this.eventId;
+  }
+
+  getInventoryCode(): string {
+    return this.inventoryCode;
+  }
+
+  getGuid(): string {
+    return this.guid;
+  }
+
+  getPayloadBase64(): string {
+    return this.payloadBase64;
+  }
 }

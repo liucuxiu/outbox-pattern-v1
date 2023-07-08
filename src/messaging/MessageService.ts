@@ -1,4 +1,6 @@
-export abstract class MessageService {
-  abstract publish(message: string): void;
+export interface MessageService {
+  sendMessage(message: string): Promise<void>;
+  start(): Promise<void>;
+  consumeMessage(callback: (message: string) => void): Promise<void>;
 }
 
