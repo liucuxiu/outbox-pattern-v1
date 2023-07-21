@@ -17,13 +17,15 @@ export class RabbitMQService implements MessageService {
       amqp.connect('amqp://localhost:5672', (error, connection) => {
         if (error) {
           reject(error);
-        } else {
+        }
+        else {
           this.connection = connection;
 
           connection.createChannel((channelError, channel) => {
             if (channelError) {
               reject(channelError);
-            } else {
+            }
+            else {
               this.channel = channel;
               resolve();
             }
